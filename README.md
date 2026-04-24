@@ -7,7 +7,7 @@ This lab demonstrates the deployment of a scalable security monitoring environme
 The project highlights the transition from traditional on-premise monitoring to a cost-effective, cloud infrastructure.
 
 ## 🏗️ Technical Architecture
-![test](https://cdn.discordapp.com/attachments/771248078652309515/1495349040001323038/azure_soc_lab.drawio_2.png?ex=69e5ebd1&is=69e49a51&hm=c7df11d1830eaa968b2825c79f93062382eae1152d185aab0ac58321523f5bfe)
+![test](https://lh3.googleusercontent.com/pw/AP1GczODnNbTipT3V8lBsiTqC8Va8rgfgxw1kzF2E8hu31aaDiH2GY078EIblCXtLomDydIEx26btVD4GsFe4-o-jxtkM-VXU1bPWfZRH-6PVmnS2RZoq9YgsGqtBlAAANx_jcoCtqjVlKvoupgEPurxxQB6=w1021-h752-s-no-gm?authuser=0)
 - **Target Zone:** Windows and Linux Honeypots (Sysmon, Cowrie) exposed to the public internet to gather telemetry.
 - **Analysis Zone:** A centralized ELK Stack (Elasticsearch, Logstash, Kibana) running on Ubuntu.
   - **Containerization:** Uptime Kuma deployed via Docker for real-time heartbeat monitoring of lab services.
