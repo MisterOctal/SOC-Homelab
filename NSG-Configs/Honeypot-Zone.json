@@ -1,0 +1,215 @@
+{
+    "apiVersion": "2025-05-01",
+    "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone",
+    "name": "Honeypot-Zone",
+    "type": "microsoft.network/networksecuritygroups",
+    "location": "malaysiawest",
+    "tags": {},
+    "properties": {
+        "provisioningState": "Succeeded",
+        "resourceGuid": "fed95016-249d-49ae-a943-ab40465ec9a6",
+        "securityRules": [
+            {
+                "name": "Allow-MyIP-Admin",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/securityRules/Allow-MyIP-Admin",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Grants unrestricted administrative access (RDP/SSH/HTTPS) to the honeypot subnet exclusively for the lab owner's whitelisted source IP.",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "[HOME_IP]",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 100,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "Allow-SSH-Bait",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/securityRules/Allow-SSH-Bait",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Placeholder: Currently set to Deny to prevent premature exposure of the SSH service during the build phase.",
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "22",
+                    "sourceAddressPrefix": "Internet",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 200,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "Allow-RDP-Bait",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/securityRules/Allow-RDP-Bait",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Placeholder: Currently set to Deny to prevent premature exposure of the RDP service during the build phase.",
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "3389",
+                    "sourceAddressPrefix": "Internet",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 210,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            }
+        ],
+        "defaultSecurityRules": [
+            {
+                "name": "AllowVnetInBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/defaultSecurityRules/AllowVnetInBound",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allow inbound traffic from all VMs in VNET",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "VirtualNetwork",
+                    "destinationAddressPrefix": "VirtualNetwork",
+                    "access": "Allow",
+                    "priority": 65000,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "AllowAzureLoadBalancerInBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allow inbound traffic from azure load balancer",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "AzureLoadBalancer",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 65001,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "DenyAllInBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/defaultSecurityRules/DenyAllInBound",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Deny all inbound traffic",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 65500,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "AllowVnetOutBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/defaultSecurityRules/AllowVnetOutBound",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "VirtualNetwork",
+                    "destinationAddressPrefix": "VirtualNetwork",
+                    "access": "Allow",
+                    "priority": 65000,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "AllowInternetOutBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/defaultSecurityRules/AllowInternetOutBound",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allow outbound traffic from all VMs to Internet",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "Internet",
+                    "access": "Allow",
+                    "priority": 65001,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "DenyAllOutBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone/defaultSecurityRules/DenyAllOutBound",
+                "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Deny all outbound traffic",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 65500,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            }
+        ]
+    },
+    "etag": "W/\"d8b807e3-7d78-44be-959c-a3101ec9d042\""
+}

@@ -1,0 +1,281 @@
+{
+    "apiVersion": "2025-05-01",
+    "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone",
+    "name": "Analysis-Zone",
+    "type": "microsoft.network/networksecuritygroups",
+    "location": "malaysiawest",
+    "tags": {},
+    "properties": {
+        "provisioningState": "Succeeded",
+        "resourceGuid": "7aeeeb7f-205d-482e-9546-edb7be781f92",
+        "securityRules": [
+            {
+                "name": "Allow-MyIP-Admin",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/securityRules/Allow-MyIP-Admin",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Grants unrestricted administrative access (RDP/SSH/HTTPS) to the analysis subnet exclusively for the lab owner's whitelisted source IP.",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "[HOME_IP]",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 100,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "Allow-Beats-Logs",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/securityRules/Allow-Beats-Logs",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allows telemetry ingestion by allowing internal agents (Filebeat/Winlogbeat) from the Honeypot zone to transmit data on port 5044.",
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "5044",
+                    "sourceAddressPrefix": "VirtualNetwork",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 200,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "Allow-Kuma-Internal",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/securityRules/Allow-Kuma-Internal",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Enables internal heartbeat checks and status monitoring of Dockerized services within the Virtual Network.",
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "3001",
+                    "sourceAddressPrefix": "VirtualNetwork",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 210,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "Allow-To-Sentinel",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/securityRules/Allow-To-Sentinel",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Authorizes the secure transmission of processed security events and alerts to the Microsoft Sentinel Log Analytics Workspace over HTTPS.",
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "443",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "AzureMonitor",
+                    "access": "Allow",
+                    "priority": 100,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "Allow-Web-Access",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/securityRules/Allow-Web-Access",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Required for running docker pull and initiating updates on hosts.",
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "443",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "Internet",
+                    "access": "Allow",
+                    "priority": 110,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "Deny-All-Internet",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/securityRules/Deny-All-Internet",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Prevents the Analysis server from initiating unauthorized external internet connections.",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 1000,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            }
+        ],
+        "defaultSecurityRules": [
+            {
+                "name": "AllowVnetInBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/defaultSecurityRules/AllowVnetInBound",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allow inbound traffic from all VMs in VNET",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "VirtualNetwork",
+                    "destinationAddressPrefix": "VirtualNetwork",
+                    "access": "Allow",
+                    "priority": 65000,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "AllowAzureLoadBalancerInBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allow inbound traffic from azure load balancer",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "AzureLoadBalancer",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 65001,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "DenyAllInBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/defaultSecurityRules/DenyAllInBound",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Deny all inbound traffic",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 65500,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "AllowVnetOutBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/defaultSecurityRules/AllowVnetOutBound",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "VirtualNetwork",
+                    "destinationAddressPrefix": "VirtualNetwork",
+                    "access": "Allow",
+                    "priority": 65000,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "AllowInternetOutBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/defaultSecurityRules/AllowInternetOutBound",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Allow outbound traffic from all VMs to Internet",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "Internet",
+                    "access": "Allow",
+                    "priority": 65001,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            },
+            {
+                "name": "DenyAllOutBound",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone/defaultSecurityRules/DenyAllOutBound",
+                "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\"",
+                "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "description": "Deny all outbound traffic",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 65500,
+                    "direction": "Outbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
+            }
+        ]
+    },
+    "etag": "W/\"fa810b03-04a9-4fdb-8c80-ff0ca242642c\""
+}
