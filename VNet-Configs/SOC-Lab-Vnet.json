@@ -1,0 +1,116 @@
+{
+    "apiVersion": "2025-05-01",
+    "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/virtualNetworks/SOC-Lab-Vnet",
+    "name": "SOC-Lab-Vnet",
+    "type": "microsoft.network/virtualnetworks",
+    "location": "malaysiawest",
+    "tags": {},
+    "properties": {
+        "provisioningState": "Succeeded",
+        "resourceGuid": "dbaa86c8-9ce5-4905-8520-38fea512b6dd",
+        "addressSpace": {
+            "addressPrefixes": [
+                "10.0.0.0/16"
+            ]
+        },
+        "encryption": {
+            "enabled": false,
+            "enforcement": "AllowUnencrypted"
+        },
+        "privateEndpointVNetPolicies": "Disabled",
+        "subnets": [
+            {
+                "name": "subnet-landing",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/virtualNetworks/SOC-Lab-Vnet/subnets/subnet-landing",
+                "etag": "W/\"40923f26-6b8e-4397-af1e-49e0eb38d8f0\"",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "addressPrefixes": [
+                        "10.0.1.0/24"
+                    ],
+                    "delegations": [],
+                    "privateEndpointNetworkPolicies": "Disabled",
+                    "privateLinkServiceNetworkPolicies": "Enabled",
+                    "defaultOutboundAccess": false
+                },
+                "type": "Microsoft.Network/virtualNetworks/subnets"
+            },
+            {
+                "name": "subnet-management",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/virtualNetworks/SOC-Lab-Vnet/subnets/subnet-management",
+                "etag": "W/\"40923f26-6b8e-4397-af1e-49e0eb38d8f0\"",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "addressPrefixes": [
+                        "10.0.2.0/24"
+                    ],
+                    "networkSecurityGroup": {
+                        "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Management-Zone"
+                    },
+                    "delegations": [],
+                    "privateEndpointNetworkPolicies": "Disabled",
+                    "privateLinkServiceNetworkPolicies": "Enabled",
+                    "defaultOutboundAccess": false
+                },
+                "type": "Microsoft.Network/virtualNetworks/subnets"
+            },
+            {
+                "name": "subnet-analysis",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/virtualNetworks/SOC-Lab-Vnet/subnets/subnet-analysis",
+                "etag": "W/\"40923f26-6b8e-4397-af1e-49e0eb38d8f0\"",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "addressPrefixes": [
+                        "10.0.3.0/24"
+                    ],
+                    "networkSecurityGroup": {
+                        "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Analysis-Zone"
+                    },
+                    "delegations": [],
+                    "privateEndpointNetworkPolicies": "Disabled",
+                    "privateLinkServiceNetworkPolicies": "Enabled",
+                    "defaultOutboundAccess": false
+                },
+                "type": "Microsoft.Network/virtualNetworks/subnets"
+            },
+            {
+                "name": "subnet-honeypot",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/virtualNetworks/SOC-Lab-Vnet/subnets/subnet-honeypot",
+                "etag": "W/\"40923f26-6b8e-4397-af1e-49e0eb38d8f0\"",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "addressPrefixes": [
+                        "10.0.4.0/24"
+                    ],
+                    "networkSecurityGroup": {
+                        "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/networkSecurityGroups/Honeypot-Zone"
+                    },
+                    "delegations": [],
+                    "privateEndpointNetworkPolicies": "Disabled",
+                    "privateLinkServiceNetworkPolicies": "Enabled",
+                    "defaultOutboundAccess": false
+                },
+                "type": "Microsoft.Network/virtualNetworks/subnets"
+            },
+            {
+                "name": "subnet-spare",
+                "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/SOC-Lab-RG/providers/Microsoft.Network/virtualNetworks/SOC-Lab-Vnet/subnets/subnet-spare",
+                "etag": "W/\"40923f26-6b8e-4397-af1e-49e0eb38d8f0\"",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "addressPrefixes": [
+                        "10.0.5.0/24"
+                    ],
+                    "delegations": [],
+                    "privateEndpointNetworkPolicies": "Disabled",
+                    "privateLinkServiceNetworkPolicies": "Enabled",
+                    "defaultOutboundAccess": false
+                },
+                "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+        ],
+        "virtualNetworkPeerings": [],
+        "enableDdosProtection": false
+    },
+    "etag": "W/\"40923f26-6b8e-4397-af1e-49e0eb38d8f0\""
+}
