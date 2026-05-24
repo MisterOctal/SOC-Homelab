@@ -1,0 +1,103 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachines_vm_honeypot_name": {
+      "defaultValue": "vm-honeypot",
+      "type": "String"
+    },
+    "disks_vm_honeypot_OsDisk_1_aeab46786b3c4f15a065253726d32a9c_externalid": {
+      "defaultValue": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG-SOC-Lab/providers/Microsoft.Compute/disks/vm-honeypot_OsDisk_1_aeab46786b3c4f15a065253726d32a9c",
+      "type": "String"
+    },
+    "networkInterfaces_vm_honeypot973_externalid": {
+      "defaultValue": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG-SOC-Lab/providers/Microsoft.Network/networkInterfaces/vm-honeypot973",
+      "type": "String"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2025-04-01",
+      "name": "[parameters('virtualMachines_vm_honeypot_name')]",
+      "location": "malaysiawest",
+      "zones": [
+        "1"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_B2ats_v2"
+        },
+        "additionalCapabilities": {
+          "hibernationEnabled": false
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "canonical",
+            "offer": "ubuntu-24_04-lts",
+            "sku": "server",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Linux",
+            "name": "[concat(parameters('virtualMachines_vm_honeypot_name'), '_OsDisk_1_aeab46786b3c4f15a065253726d32a9c')]",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "managedDisk": {
+              "id": "[parameters('disks_vm_honeypot_OsDisk_1_aeab46786b3c4f15a065253726d32a9c_externalid')]"
+            },
+            "deleteOption": "Delete"
+          },
+          "dataDisks": [],
+          "diskControllerType": "SCSI"
+        },
+        "osProfile": {
+          "computerName": "[parameters('virtualMachines_vm_honeypot_name')]",
+          "adminUsername": "REDACTED_ADMIN_USER",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "/home/REDACTED_ADMIN_USER/.ssh/authorized_keys",
+                  "keyData": "ssh-rsa REDACTED_SSH_PUBLIC_KEY"
+                }
+              ]
+            },
+            "provisionVMAgent": true,
+            "patchSettings": {
+              "patchMode": "ImageDefault",
+              "assessmentMode": "ImageDefault"
+            }
+          },
+          "secrets": [],
+          "allowExtensionOperations": true,
+          "requireGuestProvisionSignal": true
+        },
+        "securityProfile": {
+          "uefiSettings": {
+            "secureBootEnabled": true,
+            "vTpmEnabled": true
+          },
+          "securityType": "TrustedLaunch"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[parameters('networkInterfaces_vm_honeypot973_externalid')]",
+              "properties": {
+                "deleteOption": "Detach"
+              }
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true
+          }
+        }
+      }
+    }
+  ]
+}

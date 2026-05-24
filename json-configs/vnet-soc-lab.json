@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworks_vnet_soc_lab_name": {
+      "defaultValue": "vnet-soc-lab",
+      "type": "String"
+    },
+    "networkSecurityGroups_nsg_analysis_externalid": {
+      "defaultValue": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG-SOC-Lab/providers/Microsoft.Network/networkSecurityGroups/nsg-analysis",
+      "type": "String"
+    },
+    "networkSecurityGroups_nsg_target_externalid": {
+      "defaultValue": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG-SOC-Lab/providers/Microsoft.Network/networkSecurityGroups/nsg-target",
+      "type": "String"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2025-05-01",
+      "name": "[parameters('virtualNetworks_vnet_soc_lab_name')]",
+      "location": "malaysiawest",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "encryption": {
+          "enabled": false,
+          "enforcement": "AllowUnencrypted"
+        },
+        "privateEndpointVNetPolicies": "Disabled",
+        "subnets": [
+          {
+            "name": "snet-analysis",
+            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_vnet_soc_lab_name'), 'snet-analysis')]",
+            "properties": {
+              "addressPrefixes": [
+                "10.0.1.0/24"
+              ],
+              "networkSecurityGroup": {
+                "id": "[parameters('networkSecurityGroups_nsg_analysis_externalid')]"
+              },
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            },
+            "type": "Microsoft.Network/virtualNetworks/subnets"
+          },
+          {
+            "name": "snet-target",
+            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_vnet_soc_lab_name'), 'snet-target')]",
+            "properties": {
+              "addressPrefixes": [
+                "10.0.2.0/24"
+              ],
+              "networkSecurityGroup": {
+                "id": "[parameters('networkSecurityGroups_nsg_target_externalid')]"
+              },
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            },
+            "type": "Microsoft.Network/virtualNetworks/subnets"
+          }
+        ],
+        "virtualNetworkPeerings": [],
+        "enableDdosProtection": false
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2025-05-01",
+      "name": "[concat(parameters('virtualNetworks_vnet_soc_lab_name'), '/snet-analysis')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_vnet_soc_lab_name'))]"
+      ],
+      "properties": {
+        "addressPrefixes": [
+          "10.0.1.0/24"
+        ],
+        "networkSecurityGroup": {
+          "id": "[parameters('networkSecurityGroups_nsg_analysis_externalid')]"
+        },
+        "delegations": [],
+        "privateEndpointNetworkPolicies": "Disabled",
+        "privateLinkServiceNetworkPolicies": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2025-05-01",
+      "name": "[concat(parameters('virtualNetworks_vnet_soc_lab_name'), '/snet-target')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_vnet_soc_lab_name'))]"
+      ],
+      "properties": {
+        "addressPrefixes": [
+          "10.0.2.0/24"
+        ],
+        "networkSecurityGroup": {
+          "id": "[parameters('networkSecurityGroups_nsg_target_externalid')]"
+        },
+        "delegations": [],
+        "privateEndpointNetworkPolicies": "Disabled",
+        "privateLinkServiceNetworkPolicies": "Enabled"
+      }
+    }
+  ]
+}

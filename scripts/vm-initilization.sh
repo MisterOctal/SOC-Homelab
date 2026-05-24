@@ -18,7 +18,6 @@ echo "Updating package lists..."
 apt-get update -y
 
 echo "Upgrading system packages..."
-# 'dist-upgrade' handles changing dependencies better than standard 'upgrade'
 apt-get dist-upgrade -y
 
 echo "Installing common troubleshooting tools..."
