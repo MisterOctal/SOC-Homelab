@@ -8,4 +8,11 @@ services:
       - "22:2222"
       - "23:2223"
     volumes:
-      - ./var/log/cowrie:/cowrie/cowrie-git/var/log/cowrie
+      - /home/labadmin/cowrie/var/log/cowrie:/cowrie/cowrie-git/var/log/cowrie
+      # Day 4 content:
+      - /home/labadmin/cowrie/cowrie.cfg:/cowrie/cowrie-git/etc/cowrie.cfg
+      - /home/labadmin/cowrie/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt
+      - /home/labadmin/cowrie/honeyfs/etc/passwd:/cowrie/cowrie-git/honeyfs/etc/passwd
+      - /home/labadmin/cowrie/honeyfs/var/log:/cowrie/cowrie-git/honeyfs/var/log
+      - /home/labadmin/cowrie/honeyfs/home/dbadmin:/cowrie/cowrie-git/home/dbadmin
+
