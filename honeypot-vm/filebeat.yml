@@ -1,0 +1,24 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /home/labadmin/cowrie/var/log/cowrie/cowrie.json
+  json.message_key: message
+  json.keys_under_root: true
+  json.add_error_key: true
+  fields:
+    source: cowrie_honeypot
+    environment: lab
+  tags: ["cowrie", "honeypot"]
+
+output.logstash:
+  hosts: ["10.0.1.4:5044"]
+  ssl.enabled: false
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
