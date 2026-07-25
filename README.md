@@ -15,7 +15,7 @@ The project highlights the transition from traditional on-premise monitoring to 
 - **Management Zone:** Dedicated zone for secure management of internal assets.
 
 ## 🛡️ Key Features
-- **Cost-Efficient Ingestion:** Uses ELK as a "noise filter" to reduce Microsoft Sentinel ingestion costs.
-- **GeoIP Mapping:** Visualizes attacker origins in real-time using Logstash enrichment.
+- **Dual-Logging Environments:** Uses ELK and Sentinel for best of both worlds.
+- **GeoIP Mapping:** Visualizes attacker origins using Logstash enrichment.
 - **Automated Response:** Employs Azure Logic Apps (SOAR) to respond to high-fidelity alerts.
 - **Availability Monitoring:** Monitoring via containerized Uptime Kuma.
