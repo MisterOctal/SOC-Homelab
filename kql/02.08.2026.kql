@@ -1,0 +1,146 @@
+// =============================================================================
+// SOC Homelab - KQL Query Reference
+// Compiled: 02.08.2026
+// Covers: Windows honeypot analysis (Day 16) + Cowrie honeypot analysis (Days 18-19)
+// Platform: Microsoft Sentinel / Log Analytics Workspace
+// Note: IPs referenced in comments are defanged (e.g. 91[.]199[.]133[.]133)
+//       to prevent accidental clickable/resolvable links in documentation.
+// =============================================================================
+
+
+// -----------------------------------------------------------------------------
+// DAY 16 - Windows Honeypot (Event table, via AMA generic Windows Event Logs)
+// Note: table is "Event", not "SecurityEvent", since data landed via a generic
+// DCR rather than the dedicated Windows Security Events connector.
+// -----------------------------------------------------------------------------
+
+// Failed logon attempts, grouped by source IP
+Event
+| where EventLog == "Security" and EventID == 4625
+| extend IpAddress = extract(@"<Data Name=['\"]IpAddress['\"]>([^<]+)</Data>", 1, EventData)
+| summarize FailedAttempts = count() by IpAddress
+| sort by FailedAttempts desc
+// Top result during this analysis window was confirmed malicious via AbuseIPDB
+// (100% abuse confidence, Brazilian ISP) - see writeup for full details.
+
+// Failed logon attempts, grouped by target username
+Event
+| where EventLog == "Security" and EventID == 4625
+| extend TargetUserName = extract(@"<Data Name=['\"]TargetUserName['\"]>([^<]+)</Data>", 1, EventData)
+| summarize count() by TargetUserName
+
+// Attack volume over time, hourly buckets
+Event
+| where EventLog == "Security" and EventID == 4625
+| summarize AttemptCount = count() by bin(TimeGenerated, 1h)
+| sort by TimeGenerated asc
+
+// Successful logons filtered to known decoy/bait accounts
+// IMPORTANT CONTEXT: results here required manual follow-up. Successful 4624
+// events on these accounts turned out to be platform/service logons, not real
+// external compromises. Always check LogonType and source IP before treating
+// a hit here as genuine - see hardened version below.
+Event
+| where EventLog == "Security" and EventID == 4624
+| extend TargetUserName = extract(@"<Data Name=['\"]TargetUserName['\"]>([^<]+)</Data>", 1, EventData)
+| where TargetUserName in ("admin", "guest", "test", "backup", "support", "sql", "user", "demo")
+
+// Hardened version of the above - filters out service/internal logons,
+// only surfaces genuine external RDP (RemoteInteractive) sessions
+Event
+| where EventLog == "Security" and EventID == 4624
+| extend TargetUserName = extract(@"<Data Name=['\"]TargetUserName['\"]>([^<]+)</Data>", 1, EventData)
+| extend LogonType = extract(@"<Data Name=['\"]LogonType['\"]>([^<]+)</Data>", 1, EventData)
+| extend IpAddress = extract(@"<Data Name=['\"]IpAddress['\"]>([^<]+)</Data>", 1, EventData)
+| where TargetUserName in ("admin", "guest", "test", "backup", "support", "sql", "user", "demo")
+| where LogonType == "10"
+| where IpAddress != "-" and IpAddress != "127.0.0.1"
+
+
+// -----------------------------------------------------------------------------
+// DAY 18-19 - Cowrie Honeypot (custom table: cowrie_CL)
+// Note: TimeGenerated is NOT reliable for historically-backfilled rows - a
+// pipeline limitation meant all bulk-ingested historical data landed stamped
+// with ingestion time rather than the original embedded event timestamp.
+// Queries relying on time-of-day/date grouping are only meaningful for data
+// ingested fresh (post-fix), not the backfilled portion. See writeup for details.
+// -----------------------------------------------------------------------------
+
+// Confirm fresh ingestion after forcing an AMA restart (workaround for a
+// Fluent Bit tail-detection limitation - restart forces a fresh file read)
+cowrie_CL
+| where ingestion_time() > ago(1h)
+| count
+
+// Dataset scope verification - confirms broad, varied source traffic rather
+// than a narrow slice, using session/IP diversity instead of unreliable timestamps
+cowrie_CL
+| where eventid == "cowrie.session.connect"
+| summarize SessionCount = dcount(session), UniqueIPs = dcount(src_ip)
+
+// Event type distribution - sanity check for realistic data shape
+cowrie_CL
+| summarize count() by eventid
+| sort by count_ desc
+
+// Top source IPs by failed login volume
+cowrie_CL
+| where eventid == "cowrie.login.failed"
+| summarize FailedAttempts = count() by src_ip
+| sort by FailedAttempts desc
+| take 10
+
+// Most commonly attempted username/password pairs
+cowrie_CL
+| where eventid == "cowrie.login.failed"
+| summarize count() by username, password
+| sort by count_ desc
+| take 10
+
+// Password reuse across distinct usernames - signals dictionary/wordlist attacks
+cowrie_CL
+| where eventid == "cowrie.login.failed"
+| summarize UsernamesTried = dcount(username) by password
+| sort by UsernamesTried desc
+| take 10
+
+// Successful logins with session IDs, for follow-up command-history analysis
+cowrie_CL
+| where eventid == "cowrie.login.success"
+| project TimeGenerated, username, password, src_ip, session
+
+// All commands entered across all sessions
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| project TimeGenerated, src_ip, session, input
+| sort by TimeGenerated desc
+
+// Session duration outliers - unusually long sessions can indicate a manual/
+// interactive attacker rather than a scripted scanner
+cowrie_CL
+| where eventid == "cowrie.session.closed"
+| extend DurationSeconds = todouble(duration)
+| sort by DurationSeconds desc
+| take 10
+| project src_ip, session, DurationSeconds
+
+// Protocol breakdown - SSH vs Telnet volume comparison
+cowrie_CL
+| summarize count() by protocol
+
+// Command count per session - used to spot sessions with unusually high
+// interaction volume compared to typical 1-2 command scanner noise
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| summarize count() by session
+| sort by count_ desc
+
+// Full command sequence for a specific session of interest.
+// Example below is the session that led to a confirmed malware deployment
+// chain (source IP 91[.]199[.]133[.]133, AbuseIPDB/VirusTotal confirmed
+// malicious, files "real_x86_64" and "deploy.sh" independently matched
+// on VirusTotal's Communicating Files for this IP). See Day 19 writeup
+// for the full command-by-command breakdown.
+cowrie_CL
+| where session == "a6ae8bbbe44e"
+| where eventid == "cowrie.command.input"
