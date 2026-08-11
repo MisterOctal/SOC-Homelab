@@ -11,7 +11,7 @@ The project highlights the transition from traditional on-premise monitoring to 
 - **Target Zone:** Windows and Linux Honeypots (Sysmon, Cowrie) exposed to the public internet to gather telemetry.
 - **Analysis Zone:** A centralized ELK Stack (Elasticsearch, Logstash, Kibana) running on Ubuntu.
   - **Containerization:** Uptime Kuma deployed via Docker for real-time heartbeat monitoring of lab services.
-- **SIEM/SOAR Zone:** Microsoft Sentinel integration for advanced KQL threat hunting and incident response automation.
+- **SIEM/SOAR Zone:** Microsoft Sentinel integration for advanced KQL threat hunting and incident response.
 - **Management Zone:** Dedicated zone for secure management of internal assets.
 
 ## 🛡️ Key Features

@@ -1,0 +1,277 @@
+// =============================================================================
+// SOC Homelab - MITRE ATT&CK Detection Queries
+// Compiled: 11.08.2026
+// Covers: Cowrie honeypot analysis (Day 21) - comprehensive technique mapping
+// Platform: Microsoft Sentinel / Log Analytics Workspace
+// Note: Queries execute against cowrie_CL custom table (May 24 - Aug 2, 2026)
+//       Contains ~46k events from 317 unique source IPs
+//       WARNING: TimeGenerated is unreliable for bulk historical data (see Day 18 notes)
+// =============================================================================
+
+
+// =============================================================================
+// RECONNAISSANCE TECHNIQUES
+// =============================================================================
+
+// T1592 - Gather Victim Host Information
+// Attackers enumerate system architecture, CPU capabilities, OS version
+// to fingerprint targets for payload selection
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("uname", "cpuinfo", "lscpu", "free", "cat /proc")
+| project src_ip, session, input
+// Result: Multiple sessions executing uname -s -v -n -m for OS/arch enumeration
+// Indicates systematic profiling before payload deployment
+
+
+// T1083 - File and Directory Discovery
+// Basic filesystem reconnaissance via ls, find, locate commands
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("ls", "find", "locate", "dir")
+| project src_ip, session, input
+// Result: Confirmed across multiple sessions, typical scanner behavior
+
+
+// T1087 - Account Discovery
+// User enumeration after gaining access
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("id", "whoami", "getent", "cat /etc/passwd")
+| project src_ip, session, input
+// Result: Attackers consistently check execution context via id/whoami
+// followed by full user enumeration via /etc/passwd
+
+
+// T1580 - Cloud Infrastructure Discovery
+// GPU and CPU profiling for resource-intensive payload selection
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("nvidia", "gpu", "cuda", "cpus", "lscpu")
+| project src_ip, session, input
+// Result: Explicit GPU detection attempts, suggests cryptomining targeting
+
+
+// =============================================================================
+// CREDENTIAL ACCESS TECHNIQUES
+// =============================================================================
+
+// T1110.003 - Brute Force - Password Spraying
+// High-volume credential spraying from distributed sources
+cowrie_CL
+| where eventid == "cowrie.login.failed"
+| summarize FailedAttempts = count() by src_ip
+| where FailedAttempts > 10
+| sort by FailedAttempts desc
+| project src_ip, FailedAttempts
+// Result: 103.82.210.181 = 1431 attempts (most aggressive)
+//         37.111.53.110 = 1396 attempts
+//         103.204.167.40 = 891 attempts
+//         91.92.42.87 = 766 attempts
+// Pattern: Coordinated botnet or distributed scanner infrastructure
+
+
+// T1110.004 - Brute Force - Credential Stuffing
+// Dictionary-based password attempts across multiple usernames
+cowrie_CL
+| where eventid == "cowrie.login.failed"
+| summarize UsernamesTried = dcount(username) by password
+| where UsernamesTried > 5
+| sort by UsernamesTried desc
+| project password, UsernamesTried
+// Result: "123456" tried against 69 usernames (top password)
+//         "123" tried against 43 usernames
+//         "1234" tried against 39 usernames
+// Pattern: Generic wordlist attacks, not targeted based on prior intelligence
+
+
+// =============================================================================
+// PERSISTENCE / ACCESS TECHNIQUES
+// =============================================================================
+
+// T1098 - Account Manipulation
+// Reuse of discovered credentials across multiple sessions
+cowrie_CL
+| where eventid == "cowrie.login.success"
+| summarize SessionCount = dcount(session) by username, password, src_ip
+| where SessionCount > 1
+| sort by SessionCount desc
+| project username, password, src_ip, SessionCount
+// Result: root/123456 used in 3 sessions from different IPs
+//         admin/admin123 in 2 sessions
+//         deploy/deploy in 2 sessions
+// Pattern: Attackers reusing successful credentials
+
+
+// =============================================================================
+// DEFENSE EVASION TECHNIQUES
+// =============================================================================
+
+// T1222.002 - File and Directory Permissions Modification
+// chattr/chmod/chown commands to manipulate access controls
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("chattr", "chmod", "chown")
+| project src_ip, session, input
+// Result: File permission modification confirmed across sessions
+
+
+// T1622 - Debugger Evasion
+// Shell behavior testing to detect execution environment differences
+// Can identify sandboxes, monitoring systems, or restricted environments
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("echo", "test", "sh -c", "/dev/null")
+| project src_ip, session, input
+// Result: Environment testing via error redirection and command substitution
+
+
+// =============================================================================
+// DISCOVERY TECHNIQUES (CONTINUED)
+// =============================================================================
+
+// Already covered above:
+// - T1580 (Cloud Infrastructure Discovery)
+// - T1083 (File and Directory Discovery)
+// - T1087 (Account Discovery)
+
+
+// =============================================================================
+// COMMAND AND CONTROL TECHNIQUES
+// =============================================================================
+
+// T1071.001 - Application Layer Protocol - HTTP
+// HTTP-based payload delivery via wget and curl
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("wget", "curl") and input has "http"
+| project src_ip, session, input
+// Result: Downloads from 91.199.133.133:8080/deploy.sh and 31.56.209.153/bins.sh
+//         Pattern: HTTP C2 communication for payload staging
+
+
+// T1008 - Fallback Channels
+// Multiple delivery methods indicate resilience against environment restrictions
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("wget", "curl", "/dev/tcp", "python")
+| summarize MethodCount = dcount(input) by session, src_ip
+| where MethodCount > 2
+| sort by MethodCount desc
+| project session, src_ip, MethodCount
+// Result: Session a6ae8bbbe44e (91.92.40.18) used 7 distinct delivery methods
+//         Pattern: Sophisticated attacker anticipating environment restrictions
+
+
+// T1105 - Ingress Tool Transfer
+// Download and execution of external payloads
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("-O", "| sh", "> /tmp/", "| bash")
+| project src_ip, session, input
+// Result: Multiple payload delivery patterns confirmed:
+//         - wget -O /tmp/ (file output)
+//         - wget | sh (direct pipe execution)
+//         - curl | bash (alternative pipe method)
+
+
+// T1571 - Non-Standard Port
+// Download commands with explicit port specifications
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input contains ":" and input has_any ("wget", "curl")
+| project src_ip, session, input
+// Result: Port specifications in download commands confirmed
+
+
+// =============================================================================
+// EXECUTION TECHNIQUES
+// =============================================================================
+
+// T1651 - Stage Capabilities
+// Hex-encoded payload staging to evade string-based detection
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("echo -ne", "echo -e", "printf", "\\x")
+| project src_ip, session, input
+// Result: Hex-escaped byte sequences used to construct payloads
+//         Pattern: Piece-by-piece script construction to avoid detection
+
+
+// T1204.002 - User Execution - Malicious File
+// Execution of downloaded malicious scripts
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("./", "bash /tmp/", "sh /tmp/")
+| project src_ip, session, input
+// Result: Downloaded files executed via ./ and sh/bash wrappers
+
+
+// =============================================================================
+// IMPACT TECHNIQUES
+// =============================================================================
+
+// T1496 - Resource Hijacking
+// Cryptominer deployment indicators (no explicit executions logged)
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| where input has_any ("xmrig", "mining", "stratum", "monero", "gpu")
+| project src_ip, session, input
+// Result: No results, but systematic GPU/CPU profiling in reconnaissance
+//         strongly suggests cryptomining as final payload objective
+
+
+// =============================================================================
+// SESSION-LEVEL ANALYSIS
+// =============================================================================
+
+// Multi-command sessions indicating post-exploitation activity
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| summarize CommandCount = count() by session, src_ip
+| where CommandCount > 5
+| sort by CommandCount desc
+| project session, src_ip, CommandCount
+// Result: Session a6ae8bbbe44e had 26 commands (far outlier)
+//         Most sessions: 1-2 commands (typical scanner noise)
+
+
+// Successful login + command execution chain correlation
+cowrie_CL
+| where eventid == "cowrie.login.success"
+| project session, src_ip, username
+| join kind=inner (
+  cowrie_CL
+  | where eventid == "cowrie.command.input"
+  | project session
+) on session
+// Result: Identifies which successful logins led to actual command execution
+
+
+// Session duration outliers (>60 seconds = sustained compromise attempt)
+cowrie_CL
+| where eventid == "cowrie.session.closed"
+| where duration > 60
+| sort by duration desc
+| project src_ip, session, duration
+// Result: Most sessions are seconds, outliers indicate manual/interactive attacker
+
+
+// Protocol breakdown (SSH vs Telnet)
+cowrie_CL
+| summarize count() by protocol
+// Result: SSH dominates traffic
+
+
+// =============================================================================
+// ATTACK INFRASTRUCTURE ANALYSIS
+// =============================================================================
+
+// Top attacking IPs across multiple techniques
+cowrie_CL
+| where eventid == "cowrie.command.input"
+| summarize UniqueCommands = dcount(input), SessionCount = dcount(session) by src_ip
+| where UniqueCommands > 3
+| sort by SessionCount desc
+| project src_ip, UniqueCommands, SessionCount
+// Result: Identifies distributed attack infrastructure
