@@ -1,5 +1,5 @@
 # Azure Cloud SOC Lab
-**Status:** Active | **Author:** MisterOctal
+**Status:** Finished | **Author:** MisterOctal
 
 ## 🎯 Project Overview
 This lab demonstrates the deployment of a scalable security monitoring environment in Microsoft Azure. It utilizes vulnerable "Honeypots" to attract global internet noise, which is then refined and analyzed through a multi-tier SIEM/SOAR pipeline.
